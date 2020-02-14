@@ -18,17 +18,16 @@
         <li class="nav-item">
             <a class="nav-link" href="/newmessages">New Messages</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/topics">Topics</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/users">Users</a>
-        </li>
     </ul>
 </nav>
 <div class="container">
-    <h2>Buenos Aires!</h2>
-    <div data-th-text="${greeting}"></div>
+    <h1>Írd be, hogy ninja...</h1>
+    <form method="POST" data-th-action="@{/addTopic}" data-th-object="${topic}">
+        <label for="text"></label>
+        <input type="text" data-th-field="*{topicTheme}" data-th-errorclass="is-invalid"/>
+        <div class="invalid-feedback" data-th-if="${#fields.hasErrors('topicTheme')}" data-th-errors="*{topicTheme}">Name Error</div>
+        <input type="submit" value="Submit"/>
+    </form>
 </div>
 </body>
 </html>

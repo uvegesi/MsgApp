@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -21,7 +22,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecConfig extends WebSecurityConfigurerAdapter {
 
-    @Bean
+    /*@Bean
     public UserDetailsService userDetailsService() {
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
         manager.createUser(User.withUsername("user").
@@ -31,16 +32,19 @@ public class WebSecConfig extends WebSecurityConfigurerAdapter {
         return manager;
     }
 
+     */
+
     @SuppressWarnings("deprecation")
     @Bean
-    public static PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         CharacterEncodingFilter filter = new CharacterEncodingFilter();
         http.addFilterBefore(filter, CsrfFilter.class)
+                .csrf().disable()
                 .formLogin()
                 .loginPage("/login").permitAll()
                 //.loginProcessingUrl("/login")
@@ -53,6 +57,8 @@ public class WebSecConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/home", "/registration").permitAll()
                 .antMatchers("/messages").permitAll()
                 .antMatchers("/statistics").hasRole("ADMIN")
+                .antMatchers("/messages/delete").hasRole("ADMIN")
+                    //ez a felső sor a crfs elleni vedelem, hogy csak admin tudja csinalni
                 .anyRequest().authenticated();
 
     }

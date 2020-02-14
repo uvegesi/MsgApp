@@ -1,4 +1,4 @@
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
@@ -22,7 +22,11 @@
 </nav>
 <div class="container">
     <form action="/messages" method="get">
-        <h1>Keresés</h1>
+        <p><button class="btn btn-success btn-lg" type="button" data-toggle="collapse" data-target="#collapseExample"
+                   aria-expanded="false" aria-controls="collapseExample"> Keresés </button></p>
+        <div class="collapse" id="collapseExample">
+
+        <h1></h1>
         <div class="form-group">
             <label for="rendezes1">Üzenet szövege</label>
             <input type="text" class="form-control" id="rendezes1" name="text">
@@ -35,11 +39,17 @@
             <label for="datefrom">Üzenet keletkezése</label>
             <input type="datetime-local" class="form-control" id="datefrom" name="date">
         </div>
+        <div data-sec-authorize="hasRole('ADMIN')">
+            <div class="form-group">
+                <label for="rendezes4">Törölt üzenetek</label>
+                <input type="text" class="form-control" id="rendezes4" name="isDeleted()">
+            </div>
+         </div>
+
         <div class="form-group">
-            <label for="rendezes">Rendezés szempontja</label>
+        <label for="rendezes">Rendezés szempontja</label>
             <select type="text" class="form-control" id="rendezes" name="orderby">
-                <option selected>Choose</option>
-                <option>Szöveg</option>
+                <option value="text">Szöveg</option>
                 <option>Író</option>
                 <option>Dátum</option>
             </select>
@@ -49,7 +59,8 @@
                 <legend class="col-form-label col-sm-2 pt-0">Rendezés iránya</legend>
                 <div class="col-sm-10">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1" checked>
+                        <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1"
+                               checked>
                         <label class="form-check-label" for="gridRadios1">
                             Növekvő
                         </label>
@@ -64,7 +75,9 @@
             </div>
         </fieldset>
         <button type="submit" class="btn btn-primary">Search</button>
+        </div>
     </form>
+
     <h1>Üzenetek</h1>
     <table class="table">
         <thead>
@@ -73,19 +86,51 @@
             <td>Szerző</td>
             <td>Szöveg</td>
             <td>Dátum</td>
+            <td>Topic</td>
             <td>Részletek</td>
+            <div data-sec-authorize="hasRole('ADMIN')">
+                <td>Aktív</td>
+            <td>Törlés</td>
+            </div>
             <td></td>
         </tr>
         </thead>
         <tr data-th-each="msg: ${msgList}">
+            <td style ="display: none" class="msgId" data-th-text="${msg.id}"></td>
             <td data-th-text="${msg.id}"></td>
-            <td data-th-text="${msg.author}"></td>
+            <td><a data-th-text="${msg.author?.username}" data-th-href="@{/users/{author}(author=${msg.author?.id})}"></a></td>
             <td data-th-text="${msg.text}"></td>
             <td data-th-text="${{msg.creationDate}}"></td>
-            <td><a data-th-href="@{/message/{id}(id=${msg.id})}">Részletek</a></td>
+            <td data-th-text="${msg.topic?.topicTheme}"></td>
+            <td><a data-th-href="@{/message/{id}(id=${msg.id})}" class="btn btn-outline-success">Részletek</a></td>
+            <div data-sec-authorize="hasRole('ADMIN')">
+                <td data-th-text="${msg.isDeleted()}"></td>
+            </div>
+            <div data-sec-authorize="hasRole('ADMIN')">
+                <td>
+                    <form data-th-action="@{messages/delete/{id}(id=${msg.id})}" method="POST">
+                        <button type="submit" class="btn btn-warning">Delete</button>
+                    </form>
+                </td>
+            </div>
         </tr>
     </table>
-
+    <form style="display: none" method="post" data-th-action="@{/messages/delete/0}">
+        <button type="submit">Delete</button>
+    </form>
+    <script>
+        $('.deleteButton').click(function(event){
+            let id = event.target.closest('tr').querySelector('.msgId').innerText;
+            $.ajax('messages/delete/'+id, {
+                method: "DELETE",
+                beforeSend: function(xhr){xhr.setRequestHeader('X-CSRF-TOKEN', $("input[name='_csrf']")[0].value);},
+                success: function(){
+                    let selector = ".msgId:contains('" + id + "')";
+                    $('#msgtbody tr').has(selector).fadeOut(3000);
+                }
+            })
+        })
+    </script>
 </div>
 </body>
 </html>

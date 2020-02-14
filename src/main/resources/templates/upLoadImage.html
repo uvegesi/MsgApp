@@ -18,17 +18,35 @@
         <li class="nav-item">
             <a class="nav-link" href="/newmessages">New Messages</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/topics">Topics</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/users">Users</a>
-        </li>
     </ul>
 </nav>
-<div class="container">
-    <h2>Buenos Aires!</h2>
-    <div data-th-text="${greeting}"></div>
+
+<div class="container ><div> th:if=" ${message}>
+    <h2 th:text="${images}"></h2>
+    <h1>Új kép feltöltése.</h1>
+
+<div>
+    <form method="POST" enctype="multipart/form-data" data-th-action="/messages/uploadImg">
+        <table>
+            <tr>
+                <td>Image to upload:</td>
+                <td><input type="file" name="file"/></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><input type="submit" value="Upload"/></td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+<div>
+    <ul>
+        <li th:each="image : ${images}">
+            <a th:href="${image}" th:text="${images}"></a>
+        </li>
+    </ul>
+</div>
+</div>
 </div>
 </body>
-</html>

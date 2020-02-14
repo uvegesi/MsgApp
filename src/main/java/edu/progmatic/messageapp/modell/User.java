@@ -1,20 +1,21 @@
-package edu.progmatic.messageapp.registration;
+package edu.progmatic.messageapp.modell;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.xml.crypto.Data;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-public class UserDto implements UserDetails {
+@Entity
+public class User implements UserDetails {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @NotNull
     @NotEmpty
@@ -29,7 +30,6 @@ public class UserDto implements UserDetails {
     private String lastName;
 
     @NotNull
-    @NotEmpty
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate dOB;
 
@@ -42,11 +42,20 @@ public class UserDto implements UserDetails {
     @NotEmpty
     private String email;
 
-    Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+    @Column
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "author")
+    private List<Message> messages;
 
-    public UserDto(@NotNull @NotEmpty String userName, @NotNull @NotEmpty String firstName, @NotNull @NotEmpty String lastName,
-                   @NotNull @NotEmpty @DateTimeFormat LocalDate dOB, @NotNull @NotEmpty String password, String matchingPassword,
-                   @NotNull @NotEmpty String email) {
+    @ManyToMany
+    private Set<Authority> authorities = new HashSet<>();
+
+    //Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+
+    public User() {
+    }
+
+    public User(String userName, String firstName, String lastName, LocalDate dOB, String password,
+                String matchingPassword, String email) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -56,7 +65,24 @@ public class UserDto implements UserDetails {
         this.email = email;
     }
 
-    public UserDto() {
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
+    }
+
+    public void setAuthorities(Set<Authority> authorities) {
+        this.authorities = authorities;
     }
 
     public LocalDate getdOB() {
@@ -81,7 +107,7 @@ public class UserDto implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return grantedAuthorities;
+        return authorities;
     }
 
     public String getPassword() {
@@ -146,6 +172,19 @@ public class UserDto implements UserDetails {
     }
 
     public void addAuthority(String authority) {
-        grantedAuthorities.add(new SimpleGrantedAuthority(authority));
+        authorities.add(new Authority(authority));
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", userName='" + userName + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", dOB=" + dOB +
+                ", password='" + password + '\'' +
+                ", matchingPassword='" + matchingPassword + '\'' +
+                '}';
     }
 }

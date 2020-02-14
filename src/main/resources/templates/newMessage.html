@@ -1,4 +1,4 @@
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
@@ -25,9 +25,17 @@
     <form method="POST" data-th-action="@{/createmessage}" data-th-object="${message}">
         <label for="text"> Üzenet:</label>
         <input type="text" data-th-field="*{text}" data-th-errorclass="is-invalid"/>
-        <div class="invalid-feedback" data-th-if="${#fields.hasErrors('text')}" data-th-errors="*{text}">Name Error</div>
+        <label for="text"></label>
+        <select th:field="*{topicId}">
+            <option th:each="topic : ${topics}"
+                    th:value="${topic.topicId}"
+                    th:text="${topic.topicTheme}">Válassz topikot!</option>
+        </select>
         <input type="submit" value="Submit"/>
+
     </form>
+    <a class="nav-link" href="/addTopic">Itt hozzhatsz léztre új topikot!</a>
+    <a class="nav-link" href="/upLoadImage">Itt meg képet!</a>
 </div>
 </body>
 </html>

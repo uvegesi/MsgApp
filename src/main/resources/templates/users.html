@@ -18,17 +18,24 @@
         <li class="nav-item">
             <a class="nav-link" href="/newmessages">New Messages</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/topics">Topics</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="/users">Users</a>
-        </li>
     </ul>
 </nav>
 <div class="container">
-    <h2>Buenos Aires!</h2>
-    <div data-th-text="${greeting}"></div>
+    <h1 data-th-text="${user.username}">Users</h1>
+    <table class="table">
+        <thead>
+        <tr>
+            <td>Szöveg</td>
+            <td>Dátum</td>
+            <td>Üzenet azonosító</td>
+
+        </tr>
+        </thead>
+        <tr data-th-each="message: ${user.messages}">
+            <td data-th-text="${message.text}"></td>
+            <td data-th-text="${message.creationDate}"></td>
+            <td><a data-th-text="${message.id}" data-th-href="@{/message/{id}(id=${message.id})}" class="nav-link"></a></td>
+
+        </tr>
+    </table>
 </div>
-</body>
-</html>

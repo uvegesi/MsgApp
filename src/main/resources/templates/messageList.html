@@ -22,17 +22,25 @@
 </nav>
 
 <div class="container">
-    <div class="card">
-        <div class="card-body">
-            <h4 class="card-title" data-th-text="${message.author?.username}"></h4>
-            <p class="card-text" data-th-text="${message.text}"></p>
-            <p class="card-text" data-th-text="${message.creationDate}"></p>
-            <p class="card-text" data-th-text="${message.id}"></p>
-        </div>
-    </div>
+    <h1>Üzenetek</h1>
+    <h2>Topik id alapján</h2>
+    <table class="table">
+        <thead>
+        <tr>
+            <td>Szerző</td>
+            <td>Szöveg</td>
+            <td>Dátum</td>
+            <td>Üzenet Azonosító</td>
+            <td></td>
+        </tr>
+        </thead>
+        <tr data-th-each="message: ${topic.messages}">
+            <td data-th-text="${message.author?.username}"></td>
+            <td data-th-text="${message.text}"></td>
+            <td data-th-text="${message.creationDate}"></td>
+            <td data-th-text="${message.id}"></td>
+        </tr>
+    </table>
 </div>
 </body>
 </html>
-
-
-

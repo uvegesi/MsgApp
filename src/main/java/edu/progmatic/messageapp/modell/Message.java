@@ -1,49 +1,76 @@
 package edu.progmatic.messageapp.modell;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.time.LocalDateTime;
 
+@Entity
 public class Message {
 
-    private static Long maxId = 1L;
+    //private static Long maxId = 1L;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     //@Size(min = 10, max = 50, message = "Not between {2} and {1} characters!")
     //@NotNull
     //@Pattern(regexp = "^[A-Z]\\w* [A-Z]\\w*", message = "Not a valid name!")
-    private String author;
+
     @NotNull
     @NotEmpty
+    @Column(name = "TEXT")
     private String text;
 
     @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm")
+    @Column(name = "CREATION_DATE")
     private LocalDateTime creationDate;
+
+    @Column(name = "IS_DELETED")
+    private boolean isDeleted;
+
+    @ManyToOne
+    private Topic topic;
+
+    @JsonIgnore
+    @ManyToOne
+    private User author;
 
     public Message() {
     }
 
-    public Message(String author, String text, LocalDateTime creationDate) {
-        this.id = maxId++;
+    public Message(User author, String text, LocalDateTime creationDate) {
+        //this.id = maxId++;
         this.author = author;
         this.text = text;
         this.creationDate = creationDate;
+        this.isDeleted = false;
     }
 
-    public Message(String author, String text) {
+    public Message(User author, String text) {
         this.author = author;
         this.text = text;
+    }
+
+    public Topic getTopic() {
+        return topic;
+    }
+
+    public void setTopic(Topic topic) {
+        this.topic = topic;
+    }
+
+    public boolean isDeleted() {
+        return isDeleted;
     }
 
     public Long getId() {
         return id;
     }
 
-    public String getAuthor() {
+    public User getAuthor() {
         return author;
     }
 
@@ -55,7 +82,7 @@ public class Message {
         return creationDate;
     }
 
-    public void setAuthor(String author) {
+    public void setAuthor(User author) {
         this.author = author;
     }
 
@@ -69,5 +96,9 @@ public class Message {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public void setDeleted(boolean deleted) {
+        isDeleted = deleted;
     }
 }
